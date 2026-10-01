@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
+import crypto from "crypto";
+import { callAI, getAIProviderInfo } from "@/lib/ai";
 
 export const dynamic = "force-dynamic";
-
-const OLLAMA_URL = "https://ollama.com/api/chat";
-const OLLAMA_MODEL = "gemma4:31b";
+export const runtime = "nodejs";
+export const maxDuration = 60;
 
 const SYSTEM_PROMPT = `You are Scam Kavach, an expert Indian fraud analyst. Analyse the message/screenshot and decide if it is a scam. Be accurate: do not over-warn, do not under-warn.
 
@@ -55,8 +56,6 @@ Output MUST be valid JSON matching this exact structure:
   "family_alert_text": "Short WhatsApp message to warn family"
 }`;
 
-import crypto from "crypto";
-
 // Simple in-memory cache
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const scanCache = new Map<string, any>();
@@ -64,19 +63,11 @@ const scanCache = new Map<string, any>();
 // Warm up model on server start
 const warmUpModel = async () => {
   try {
-    const apiKey = process.env.OLLAMA_API_KEY;
-    if (!apiKey) return;
-    await fetch(OLLAMA_URL, {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: OLLAMA_MODEL,
-        messages: [{ role: "user", content: "warmup" }],
-        options: { num_predict: 1 },
-        keep_alive: "30m"
-      })
-    });
-    console.log("🔥 Ollama warmed up!");
+    const { provider } = getAIProviderInfo();
+    if (provider !== "none") {
+      await callAI(SYSTEM_PROMPT, "warmup");
+      console.log(`🔥 AI warmed up! Provider: ${provider}`);
+    }
   } catch {
     // ignore
   }
@@ -86,10 +77,10 @@ warmUpModel();
 export async function POST(req: Request) {
   const startTime = Date.now();
   try {
-    const apiKey = process.env.OLLAMA_API_KEY;
-    if (!apiKey) {
-      console.error("❌ OLLAMA_API_KEY is missing in environment variables");
-      return NextResponse.json({ error: "AI abhi available nahi hai. Dobara try karein." }, { status: 500 });
+    const { provider, error: providerError } = getAIProviderInfo();
+    if (provider === "none") {
+      console.error("❌ AI configuration missing:", providerError);
+      return NextResponse.json({ error: "AI configuration is missing. " + providerError }, { status: 500 });
     }
 
     const body = await req.json();
@@ -123,64 +114,14 @@ export async function POST(req: Request) {
     }
     if (!promptText) promptText = "Analyze this image for scams.";
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const message: any = {
-      role: "user",
-      content: promptText,
-    };
-
-    if (imageBase64) {
-      message.images = [imageBase64];
+    let textResponse;
+    try {
+      textResponse = await callAI(SYSTEM_PROMPT, promptText, imageBase64);
+    } catch (apiError: unknown) {
+      console.error("❌ AI API Error in /api/scan:", apiError);
+      return NextResponse.json({ error: "AI abhi available nahi hai. Dobara try karein." }, { status: 500 });
     }
 
-    let response;
-    let retries = 1;
-    
-    while (retries >= 0) {
-      try {
-        const fetchRes = await fetch(OLLAMA_URL, {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${apiKey}`,
-            "Content-Type": "application/json"
-          },
-          cache: "no-store",
-          body: JSON.stringify({
-            model: OLLAMA_MODEL,
-            messages: [
-              { role: "system", content: SYSTEM_PROMPT },
-              message
-            ],
-            format: "json",
-            stream: false,
-            keep_alive: "30m",
-            options: {
-              temperature: 0.2,
-              num_predict: 500,
-              num_ctx: 4096
-            }
-          })
-        });
-
-        if (!fetchRes.ok) {
-          throw new Error(`Ollama API error: ${fetchRes.status} ${await fetchRes.text()}`);
-        }
-        
-        response = await fetchRes.json();
-        break;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (apiError: any) {
-        if (retries === 0) {
-          console.error("❌ Ollama API Error in /api/scan:");
-          console.error("- Message:", apiError?.message);
-          return NextResponse.json({ error: "AI abhi available nahi hai. Dobara try karein." }, { status: 500 });
-        }
-        retries--;
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
-    }
-
-    const textResponse = response?.message?.content;
     if (!textResponse) {
       console.error("❌ Empty response from AI in /api/scan");
       return NextResponse.json({ error: "AI abhi available nahi hai. Dobara try karein." }, { status: 500 });
@@ -190,7 +131,7 @@ export async function POST(req: Request) {
       const cleanedText = textResponse.replace(/```json/gi, '').replace(/```/g, '').trim();
       const json = JSON.parse(cleanedText);
       scanCache.set(cacheKey, json);
-      console.log(`⏱️ [API Hit] Scan took: ${Date.now() - startTime}ms`);
+      console.log(`⏱️ [API Hit] Scan took: ${Date.now() - startTime}ms. Provider: ${provider}`);
       return NextResponse.json(json);
     } catch (parseError) {
       console.error("❌ JSON Parse Error in /api/scan:", parseError);
