@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ivory: #F6F1E7;
+  --color-ink: #14181F;
+  --color-ink-secondary: #5C6270;
+  --color-forest: #0F3D2E;
+  --color-saffron: #C8963E;
+  --color-brick: #B3261E;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-devanagari: var(--font-devanagari), sans-serif;
+}
+
+body {
+  background-color: var(--color-ivory);
+  color: var(--color-ink);
+}
