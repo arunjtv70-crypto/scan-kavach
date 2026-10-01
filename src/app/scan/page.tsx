@@ -30,6 +30,7 @@ function ScanPageContent() {
   const [loading, setLoading] = useState(false);
   const [statusText, setStatusText] = useState(t("scan.status.1"));
   const [error, setError] = useState("");
+  const [errorDetails, setErrorDetails] = useState("");
   const [result, setResult] = useState<ScanResult | null>(null);
 
   useEffect(() => {
@@ -50,6 +51,7 @@ function ScanPageContent() {
       setFile(f);
       setText(""); 
       setError("");
+      setErrorDetails("");
     }
   };
 
@@ -94,6 +96,7 @@ function ScanPageContent() {
       return;
     }
     setError("");
+    setErrorDetails("");
     setLoading(true);
     setResult(null);
     setStatusText(t("scan.status.1"));
@@ -124,6 +127,7 @@ function ScanPageContent() {
 
       const data = await res.json();
       if (!res.ok) {
+        if (data.details) setErrorDetails(data.details);
         throw new Error(data.error || "Analysis failed.");
       }
       setResult(data);
@@ -331,17 +335,22 @@ function ScanPageContent() {
       </div>
 
       {error && (
-        <div className="text-brick text-sm font-semibold bg-brick/5 p-4 rounded-xl border border-brick/20 flex flex-col gap-3">
-          <div className="flex gap-2">
-            <AlertTriangle className="w-5 h-5 flex-shrink-0" />
-            <span>{error}</span>
+        <div className="flex flex-col gap-1">
+          <div className="text-brick text-sm font-semibold bg-brick/5 p-4 rounded-xl border border-brick/20 flex flex-col gap-3">
+            <div className="flex gap-2">
+              <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+              <span>{error}</span>
+            </div>
+            <button
+              onClick={handleScan}
+              className="w-full bg-brick text-white py-2 rounded-lg font-bold text-sm shadow-sm"
+            >
+              {t("scan.retry")}
+            </button>
           </div>
-          <button 
-            onClick={handleScan}
-            className="w-full bg-brick text-white py-2 rounded-lg font-bold text-sm shadow-sm"
-          >
-            {t("scan.retry")}
-          </button>
+          {errorDetails && process.env.NODE_ENV !== "production" && (
+            <p className="text-xs text-ink-secondary text-center font-mono mt-1 px-2 break-all">{errorDetails}</p>
+          )}
         </div>
       )}
 

@@ -119,7 +119,11 @@ export async function POST(req: Request) {
       textResponse = await callAI(SYSTEM_PROMPT, promptText, imageBase64);
     } catch (apiError: unknown) {
       console.error("❌ AI API Error in /api/scan:", apiError);
-      return NextResponse.json({ error: "AI abhi available nahi hai. Dobara try karein." }, { status: 500 });
+      const msg = apiError instanceof Error ? apiError.message : String(apiError);
+      return NextResponse.json({
+        error: "AI abhi available nahi hai. Dobara try karein.",
+        details: process.env.NODE_ENV !== "production" ? msg : undefined
+      }, { status: 500 });
     }
 
     if (!textResponse) {
