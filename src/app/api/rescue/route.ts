@@ -58,7 +58,7 @@ Provide specific recovery steps based on the events, the complaint draft filled 
     } catch (apiError: unknown) {
       console.error("❌ AI API Error in /api/rescue:", apiError);
       const msg = apiError instanceof Error ? apiError.message : String(apiError);
-      return NextResponse.json({
+      return NextResponse.json({ 
         error: "AI abhi available nahi hai. Dobara try karein.",
         details: process.env.NODE_ENV !== "production" ? msg : undefined
       }, { status: 500 });

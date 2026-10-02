@@ -49,13 +49,13 @@ export async function callAI(systemPrompt: string, promptText: string, imageBase
     const { GoogleGenAI } = await import("@google/genai");
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const model = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
-
+    
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const contents: any[] = [systemPrompt, promptText];
     if (imageBase64) {
       contents.push({ inlineData: { mimeType: "image/jpeg", data: imageBase64 } });
     }
-
+    
     const response = await ai.models.generateContent({
       model,
       contents,
@@ -68,7 +68,7 @@ export async function callAI(systemPrompt: string, promptText: string, imageBase
   const ollamaUrl = provider === "ollama_hosted" ? "https://ollama.com/api/chat" : `${process.env.OLLAMA_BASE_URL || "http://localhost:11434"}/api/chat`;
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (provider === "ollama_hosted") headers["Authorization"] = `Bearer ${process.env.OLLAMA_API_KEY}`;
-
+  
   if (imageBase64) messages[1].images = [imageBase64];
 
   const fetchRes = await fetch(ollamaUrl, {

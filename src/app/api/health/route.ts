@@ -13,13 +13,7 @@ export async function GET() {
   }
 
   try {
-    // Tiny AI call just to verify connection
-    // We expect valid JSON based on the system prompt we provide, but since we are just checking if it resolves:
-    const systemPrompt = "Return exactly: {\"status\": \"ok\"}";
-    const promptText = "ping";
-    
-    await callAI(systemPrompt, promptText);
-    
+    await callAI('Return exactly: {"status": "ok"}', "ping");
     return NextResponse.json({ ok: true, provider });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Unknown error";

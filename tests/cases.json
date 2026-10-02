@@ -1,0 +1,77 @@
+[
+  {
+    "id": "A",
+    "text": "BOI: Rs 2616 debited (NACH) from A/c XXXX3993. Your BOI account is being linked to your UPI app. Report on 18001031906 if not done by you.",
+    "expected": "SAFE"
+  },
+  {
+    "id": "B",
+    "text": "HDFC Bank: you can defer your EMI for Apr & May. Call 022-1234567 or click hdfcbk.co/xyz",
+    "expected": "SUSPICIOUS"
+  },
+  {
+    "id": "C",
+    "text": "Navi Pre-approved loan INR 65,000, see EMI in app. Download today.",
+    "expected": "SAFE"
+  },
+  {
+    "id": "D",
+    "text": "Your SBI account will be blocked today. Update KYC at http://sbi-kyc.xyz and share the OTP",
+    "expected": "SCAM"
+  },
+  {
+    "id": "E",
+    "text": "I am CBI officer, you are under digital arrest, stay on video call, transfer money to verify your innocence",
+    "expected": "SCAM"
+  },
+  {
+    "id": "F",
+    "text": "Pay Rs 500 registration fee to get a work-from-home job, earn 5000/day guaranteed",
+    "expected": "SCAM"
+  },
+  {
+    "id": "G",
+    "text": "Book deep tissue massage for 5 co-workers, I am on sick bed, cannot come. I will send extra 2000 for a gift card.",
+    "expected": "SCAM"
+  },
+  {
+    "id": "H",
+    "text": "Your OTP for login is 482910. Do not share",
+    "expected": "SAFE"
+  },
+  {
+    "id": "I",
+    "text": "Send me your photos or I will leak your video on facebook and ruin your life",
+    "expected": "SCAM"
+  },
+  {
+    "id": "J",
+    "text": "Dear customer, your electricity connection will be cut tonight at 9 PM. call 9876543210 immediately.",
+    "expected": "SCAM"
+  },
+  {
+    "id": "K",
+    "text": "Hey bro, out for delivery. Are you at home? package from Amazon.",
+    "expected": "SAFE"
+  },
+  {
+    "id": "L",
+    "text": "Aapka 50,000 ka lottery lag gaya hai. Processing fee 2000 bhej dijiye UPI pe taaki paisa transfer ho.",
+    "expected": "SCAM"
+  },
+  {
+    "id": "M",
+    "text": "Swiggy order #4592 delivered successfully. Rate your experience.",
+    "expected": "SAFE"
+  },
+  {
+    "id": "N",
+    "text": "Download AnyDesk app quickly so I can help fix your refund issue sir.",
+    "expected": "SCAM"
+  },
+  {
+    "id": "O",
+    "text": "Your HDFC credit card statement is generated. Minimum due is Rs 450. Pay by 5th via official app.",
+    "expected": "SAFE"
+  }
+]

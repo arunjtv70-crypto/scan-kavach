@@ -341,7 +341,7 @@ function ScanPageContent() {
               <AlertTriangle className="w-5 h-5 flex-shrink-0" />
               <span>{error}</span>
             </div>
-            <button
+            <button 
               onClick={handleScan}
               className="w-full bg-brick text-white py-2 rounded-lg font-bold text-sm shadow-sm"
             >
