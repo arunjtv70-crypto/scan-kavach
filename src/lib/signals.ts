@@ -74,6 +74,7 @@ export function scoreSignals(signals: SignalResult): { score: number; verdict: "
   if (signals.guaranteedReturns) weakFlags++;
   if (signals.urls.some(u => u.isSuspicious)) weakFlags++;
 
+  const totalFlags = redFlags + weakFlags;
   const hasOnlyLinkOrPhone = redFlags === 0 && weakFlags <= 1 && signals.urls.some(u => u.isSuspicious);
 
   if (redFlags > 0 || weakFlags >= 3) {

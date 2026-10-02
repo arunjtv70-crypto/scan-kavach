@@ -5,9 +5,9 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function runTests() {
   const casesPath = path.join(process.cwd(), "tests", "cases.json");
-  const payloads: { id: string; text: string; expected: string }[] = JSON.parse(fs.readFileSync(casesPath, "utf-8"));
+  const payloads = JSON.parse(fs.readFileSync(casesPath, "utf-8"));
 
-  const results: { Case: string; Expected: string; Got: string; Score: number; Status: string }[] = [];
+  const results: any[] = [];
   let passCount = 0;
 
   for (const p of payloads) {
@@ -40,8 +40,8 @@ async function runTests() {
         });
         
         success = true;
-      } catch (error: unknown) {
-        console.error(`Error on case ${p.id}:`, error instanceof Error ? error.message : String(error));
+      } catch (e: any) {
+        console.error(`Error on case ${p.id}:`, e.message);
         success = true;
         results.push({
           Case: p.id,

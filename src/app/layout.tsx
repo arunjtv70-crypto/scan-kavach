@@ -12,6 +12,7 @@ const notoSansDev = Noto_Sans_Devanagari({ subsets: ["devanagari"], weight: ["40
 export const metadata: Metadata = {
   title: "Scam Kavach",
   description: "AI shield against digital arrest and fraud",
+  authors: [{ name: "Arun" }],
 };
 
 export default function RootLayout({
